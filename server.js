@@ -2,12 +2,76 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 
+const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
+
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
 app.set('json spaces', 2);
+
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
+
+//Schema for owner
+const ownerSchema = {
+    type: "object",
+    properties: {
+        first_name: { type: "string", minLength: 2 },
+        last_name:  { type: "string", minLength: 2 },
+        phone:      { type: "string", minLength: 10, pattern: "^[0-9+]+$" }, 
+        email:      { type: "string", format: "email" }
+    },
+    required: ["first_name", "last_name", "phone"],
+    additionalProperties: false
+};
+
+//Schema for cats
+const catSchema = {
+    type: "object",
+    properties: {
+        name:     { type: "string", minLength: 1 },
+        gender:   { type: "string", enum: ["Male", "Female"] },
+        breed:    { type: "string" },
+        color:    { type: "string" },
+        age:      { type: "integer", minimum: 0, maximum: 30 },
+        owner_id: { type: "integer" }
+    },
+    required: ["name", "owner_id"],
+    additionalProperties: false
+};
+
+//Schema for visits
+const visitSchema = {
+    type: "object",
+    properties: {
+        cat_id:     { type: "integer" },
+        visit_date: { type: "string", format: "date-time" },
+        reason:     { type: "string", minLength: 3 },
+        notes:      { type: "string" }
+    },
+    required: ["cat_id", "visit_date", "reason"],
+    additionalProperties: false
+};
+
+function validateDto(schema) {
+    const validate = ajv.compile(schema);
+    return (req, res, next) => {
+        const valid = validate(req.body);
+        if (!valid) {
+            return res.status(400).json({
+                error: "Data validation error (AJV)",
+                details: validate.errors.map(err => ({
+                    field: err.instancePath.replace('/', ''), 
+                    message: err.message 
+                }))
+            });
+        }
+        next(); 
+    };
+}
 
 require('dotenv').config();
 
@@ -30,7 +94,6 @@ app.get('/', (req, res) => {
             cat_add: "POST /api/cats",
             cats_full: "GET /api/cats-info",
             cat_update: "PUT /api/cats/:id",
-            schedule: "GET /api/schedule",
             visit_add: "POST /api/visits",
             visit_update: "PUT /api/visits/:id",
             visit_delete: "DELETE /api/visits/:id",
@@ -48,7 +111,7 @@ app.get('/api/owners', async (req, res) => {
 });
 
 //Add new owners
-app.post('/api/owners', async (req, res) => {
+app.post('/api/owners', validateDto(ownerSchema), async (req, res) => {
     try {
         const { first_name, last_name, phone, email } = req.body;
         const result = await pool.query(
@@ -60,7 +123,7 @@ app.post('/api/owners', async (req, res) => {
 });
 
 //Update owner info
-app.put('/api/owners/:id', async (req, res) => {
+app.put('/api/owners/:id', validateDto(ownerSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const { first_name, last_name, phone, email } = req.body;
@@ -85,7 +148,7 @@ app.get('/api/owners/:id/cats', async (req, res) => {
 });
 
 //Add new cats
-app.post('/api/cats', async (req, res) => {
+app.post('/api/cats', validateDto(catSchema), async (req, res) => {
     try {
         const { name, breed, color, age, gender, owner_id } = req.body;
         const result = await pool.query(
@@ -97,13 +160,13 @@ app.post('/api/cats', async (req, res) => {
 });
 
 //Update cats info
-app.put('/api/cats/:id', async (req, res) => {
+app.put('/api/cats/:id', validateDto(catSchema),  async (req, res) => {
     try {
         const { id } = req.params;
         const { name, breed, color, age, gender, owner_id } = req.body;
         const result = await pool.query(
             'UPDATE cats SET name = $1, gender = $2, breed = $3, color = $4, age = $5, owner_id = $6 WHERE id = $7 RETURNING *',
-            [name, breed, color, age, gender, owner_id, id]
+            [name, gender, breed, color, age, owner_id, id]
         );
         
         if (result.rows.length === 0) {
@@ -135,7 +198,7 @@ app.get('/api/cats-info', async (req, res) => {
 });
 
 //Add visit
-app.post('/api/visits', async (req, res) => {
+app.post('/api/visits', validateDto(visitSchema), async (req, res) => {
     try {
         const { cat_id, visit_date, reason, notes } = req.body;
         const result = await pool.query(
@@ -147,7 +210,7 @@ app.post('/api/visits', async (req, res) => {
 });
 
 //Update info about visit
-app.put('/api/visits/:id', async (req, res) => {
+app.put('/api/visits/:id', validateDto(visitSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const { visit_date, reason, notes } = req.body;
