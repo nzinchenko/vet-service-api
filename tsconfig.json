@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2020",          // Версія JS (Node.js добре розуміє ES2020)
-    "module": "commonjs",        // Стандарт для Node.js
-    "rootDir": "./src",          // Де лежить ваш код
-    "outDir": "./dist",          // Куди класти готовий код
-    "esModuleInterop": true,     // Дозволяє імпорт бібліотек (як express)
-    "strict": true,              // Вмикає перевірку типів (головна фішка TS)
-    "skipLibCheck": true         // Пришвидшує роботу, ігноруючи чужі помилки
+    "target": "es2020",          // JS version (Node.js understands ES2020 well)
+    "module": "commonjs",        // Standard for Node.js
+    "rootDir": "./src",          // There is your code
+    "outDir": "./dist",          // Where to put the finished code
+    "esModuleInterop": true,     // Allows importing libraries (like express)
+    "strict": true,              // Enables type checking (the main feature of TS)
+    "skipLibCheck": true         // Speeds up work by ignoring other mistakes
   },
   "include": ["src"]
 }
