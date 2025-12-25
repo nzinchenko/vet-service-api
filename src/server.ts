@@ -109,7 +109,7 @@ const pool = new Pool({
 
 app.get('/', (req: Request, res: Response) => {
     res.json({
-        message: "Veterinary API",
+        message: "Veterinary Service API",
         endpoints: {
             owners: "GET /api/owners",
             owner_add: "POST /api/owners",
@@ -121,7 +121,7 @@ app.get('/', (req: Request, res: Response) => {
             visit_add: "POST /api/visits",
             visit_update: "PUT /api/visits/:id",
             visit_delete: "DELETE /api/visits/:id",
-            visit_info: "GET /api/visit"
+            visit_info: "GET /api/visits"
         }
     });
 });
