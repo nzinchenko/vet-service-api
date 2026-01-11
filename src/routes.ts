@@ -37,10 +37,10 @@ router.get('/owners', async (req, res) => {
 // Add new owners
 router.post('/owners', validateDto(ownerSchema), async (req, res) => {
     try {
-        const { first_name, last_name, phone, email } = req.body as Owner;
+        const { firstName, lastName, phone, email } = req.body as Owner;
         const result = await pool.query(
             'INSERT INTO owners (first_name, last_name, phone, email) VALUES ($1, $2, $3, $4) RETURNING *',
-            [first_name, last_name, phone, email]
+            [firstName, lastName, phone, email]
         );
         res.status(StatusCodes.CREATED).json(result.rows[0]);
     } catch (err: any) { res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message }); }
@@ -50,10 +50,10 @@ router.post('/owners', validateDto(ownerSchema), async (req, res) => {
 router.put('/owners/:id', validateDto(ownerSchema), async (req, res) => {
     try {
         const { id } = req.params;
-        const { first_name, last_name, phone, email } = req.body as Owner;
+        const { firstName, lastName, phone, email } = req.body as Owner;
         const result = await pool.query(
             'UPDATE owners SET first_name = $1, last_name = $2, phone = $3, email = $4 WHERE id = $5 RETURNING *',
-            [first_name, last_name, phone, email, id]
+            [firstName, lastName, phone, email, id]
         );
         if (result.rows.length === 0) return res.status(StatusCodes.NOT_FOUND).json({ message: "This owner not found" });
         res.json(result.rows[0]);
@@ -72,10 +72,10 @@ router.get('/owners/:id/cats', async (req, res) => {
 // Add new cats
 router.post('/cats', validateDto(catSchema), async (req, res) => {
     try {
-        const { name, breed, color, age, gender, owner_id } = req.body as Cat;
+        const { name, breed, color, age, gender, ownerId } = req.body as Cat;
         const result = await pool.query(
             'INSERT INTO cats (name, gender, breed, color, age, owner_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [name, gender, breed, color, age, owner_id]
+            [name, gender, breed, color, age, ownerId]
         );
         res.status(StatusCodes.CREATED).json(result.rows[0]);
     } catch (err: any) { 
@@ -88,10 +88,10 @@ router.post('/cats', validateDto(catSchema), async (req, res) => {
 router.put('/cats/:id', validateDto(catSchema), async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, breed, color, age, gender, owner_id } = req.body as Cat;
+        const { name, breed, color, age, gender, ownerId } = req.body as Cat;
         const result = await pool.query(
             'UPDATE cats SET name = $1, gender = $2, breed = $3, color = $4, age = $5, owner_id = $6 WHERE id = $7 RETURNING *',
-            [name, gender, breed, color, age, owner_id, id]
+            [name, gender, breed, color, age, ownerId, id]
         );
         if (result.rows.length === 0) return res.status(StatusCodes.NOT_FOUND).json({ message: "This cat not found" });
         res.json(result.rows[0]);
@@ -114,10 +114,10 @@ router.get('/cats-info', async (req, res) => {
 // Add visit
 router.post('/visits', validateDto(visitSchema), async (req, res) => {
     try {
-        const { cat_id, visit_date, reason, notes } = req.body as Visit;
+        const { catId, visitDate, reason, notes } = req.body as Visit;
         const result = await pool.query(
             'INSERT INTO visits (cat_id, visit_date, reason, notes) VALUES ($1, $2, $3, $4) RETURNING *',
-            [cat_id, visit_date, reason, notes]
+            [catId, visitDate, reason, notes]
         );
         res.status(StatusCodes.CREATED).json(result.rows[0]);
     } catch (err: any) { res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message }); }
@@ -127,10 +127,10 @@ router.post('/visits', validateDto(visitSchema), async (req, res) => {
 router.put('/visits/:id', validateDto(visitSchema), async (req, res) => {
     try {
         const { id } = req.params;
-        const { visit_date, reason, notes } = req.body as Visit;
+        const { visitDate, reason, notes } = req.body as Visit;
         const result = await pool.query(
             'UPDATE visits SET visit_date = $1, reason = $2, notes = $3 WHERE id = $4 RETURNING *',
-            [visit_date, reason, notes, id]
+            [visitDate, reason, notes, id]
         );
         if (result.rows.length === 0) return res.status(StatusCodes.NOT_FOUND).json({ message: "This visit not found" });
         res.json(result.rows[0]);

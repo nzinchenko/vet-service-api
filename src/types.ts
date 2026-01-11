@@ -7,8 +7,8 @@ export enum CatGender {
 }
 
 export interface Person { 
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email?: string;
 }
@@ -24,13 +24,13 @@ export interface Cat {
     color?: string;
     age?: number;
     gender?: CatGender;
-    owner_id: number;
+    ownerId: number;
 }
 
 export interface Visit {
     id?: number;
-    cat_id: number;
-    visit_date: string;
+    catId: number;
+    visitDate: string;
     reason: string;
     notes?: string;
 }
@@ -42,12 +42,12 @@ addFormats(ajv);
 export const ownerSchema: Schema = {
     type: "object",
     properties: {
-        first_name: { type: "string", minLength: 2 },
-        last_name:  { type: "string", minLength: 2 },
+        firstName: { type: "string", minLength: 2 },
+        lastName:  { type: "string", minLength: 2 },
         phone:      { type: "string", minLength: 10, pattern: "^[0-9+]+$" },
         email:      { type: "string", format: "email" }
     },
-    required: ["first_name", "last_name", "phone"],
+    required: ["firstName", "lastName", "phone"],
     additionalProperties: false
 };
 
@@ -62,21 +62,21 @@ export const catSchema: Schema = {
             type: "string",
             enum: Object.values(CatGender)
         },
-        owner_id: { type: "integer" }
+        ownerId: { type: "integer" }
     },
-    required: ["name", "owner_id"],
+    required: ["name", "ownerId"],
     additionalProperties: false
 };
 
 export const visitSchema: Schema = {
     type: "object",
     properties: {
-        cat_id:     { type: "integer" },
-        visit_date: { type: "string", format: "date-time" },
+        catId:     { type: "integer" },
+        visitDate: { type: "string", format: "date-time" },
         reason:     { type: "string", minLength: 3 },
         notes:      { type: "string" }
     },
-    required: ["cat_id", "visit_date", "reason"],
+    required: ["catId", "visitDate", "reason"],
     additionalProperties: false
 };
 
