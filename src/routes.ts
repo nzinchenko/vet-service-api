@@ -11,7 +11,7 @@ const router = Router();
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-//Middleware
+// Middleware
 export const validateDto = (schema: Schema) => {
     const validate = ajv.compile(schema);
 
@@ -115,9 +115,10 @@ router.get('/cats-info', async (req, res) => {
 router.post('/visits', validateDto(visitSchema), async (req, res) => {
     try {
         const { catId, visitDate, reason, notes } = req.body as Visit;
+        const visitDateUTC = new Date(visitDate).toISOString();
         const result = await pool.query(
             'INSERT INTO visits (cat_id, visit_date, reason, notes) VALUES ($1, $2, $3, $4) RETURNING *',
-            [catId, visitDate, reason, notes]
+            [catId, visitDateUTC, reason, notes]
         );
         res.status(StatusCodes.CREATED).json(result.rows[0]);
     } catch (err: any) { res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message }); }

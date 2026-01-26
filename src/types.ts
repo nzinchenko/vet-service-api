@@ -35,7 +35,7 @@ export interface Visit {
     notes?: string;
 }
 
-//JSON Schema (AJV)
+// JSON Schema (AJV)
 export const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 

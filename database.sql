@@ -25,7 +25,7 @@ CREATE TABLE cats (
 CREATE TABLE visits (
     id SERIAL PRIMARY KEY,
     cat_id INTEGER NOT NULL,
-    visit_date TIMESTAMP NOT NULL,
+    visit_date TIMESTAMPTZ NOT NULL,
     reason TEXT NOT NULL,
     notes TEXT,
     CONSTRAINT fk_cat FOREIGN KEY (cat_id) REFERENCES cats(id) ON DELETE CASCADE
